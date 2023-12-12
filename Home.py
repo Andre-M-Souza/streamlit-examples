@@ -1,11 +1,28 @@
 import streamlit as st
+from streamlit_lightweight_charts import renderLightweightCharts
+import streamlit_lightweight_charts.dataSamples as data
 import matplotlib.pyplot as plt
 import matplotlib.cbook as cbook
 from matplotlib import colors
 from matplotlib.ticker import PercentFormatter
 import numpy as np
+import pandas as pd
+import altair as alt
 
 st.set_page_config(layout='wide')
+
+
+def run_again():
+    pass
+
+
+with st.sidebar:
+
+    option = st.selectbox(
+        'Mês / Ano ?',
+        ('12/2023', '11/2023', '10/2023', '09/2023', '08/2023'),
+        on_change=run_again())
+
 
 # Chart 01
 # Pie chart, where the slices will be ordered and plotted counter-clockwise:
@@ -95,7 +112,7 @@ with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # Title...
-# st.title('Dashboard - KPI(s)')
+st.title(f'Dashboard - KPI(s): {option}')
 
 # Main Container.....
 with st.container(border=True):
@@ -206,12 +223,30 @@ with st.container(border=True):
             st.markdown('Custo por Litro')
             st.metric('registros :sunglasses:', value='54', delta='52')
 
+            chart_data = pd.DataFrame(
+                np.random.randn(20, 3), columns=["a", "b", "c"])
+
+            c = (
+                alt.Chart(chart_data)
+                .mark_circle()
+                .encode(x="a", y="b", size="c", color="c", tooltip=["a", "b", "c"])
+            )
+
+            st.altair_chart(c, use_container_width=True)
+
     with col8:
 
         with st.container(border=True):
 
             st.markdown('OTIF')
             st.metric('registros :sunglasses:', value='54', delta='52')
+
+            df = pd.DataFrame(
+                np.random.randn(5, 2) / [50, 50] +
+                [-23.46411077802282, -46.46128453747276],
+                columns=['lat', 'lon'])
+
+            st.map(df)
 
     with col9:
 
@@ -220,9 +255,88 @@ with st.container(border=True):
             st.markdown('Hora Extra')
             st.metric('registros :sunglasses:', value='54', delta='52')
 
+            chart_data = pd.DataFrame(
+                {
+                    "col1": np.random.randn(10),
+                    "col2": np.random.randn(10),
+                    "col3": np.random.choice(["A", "B", "C"], 10),
+                }
+            )
+
+            st.area_chart(chart_data, x="col1", y="col2", color="col3")
+
     with col10:
 
         with st.container(border=True):
 
             st.markdown('Absenteísmo')
-            st.metric('registros :sunglasses:', value='54', delta='52')
+            st.metric('registros :-1:', value='54', delta='52')
+
+            priceVolumeChartOptions = {
+                "height": 300,
+                "rightPriceScale": {
+                    "scaleMargins": {
+                        "top": 0.2,
+                        "bottom": 0.25,
+                    },
+                    "borderVisible": False,
+                },
+                "overlayPriceScales": {
+                    "scaleMargins": {
+                        "top": 0.7,
+                        "bottom": 0,
+                    }
+                },
+                "layout": {
+                    "background": {
+                        "type": 'solid',
+                        "color": '#131722'
+                    },
+                    "textColor": '#d1d4dc',
+                },
+                "grid": {
+                    "vertLines": {
+                        "color": 'rgba(42, 46, 57, 0)',
+                    },
+                    "horzLines": {
+                        "color": 'rgba(42, 46, 57, 0.6)',
+                    }
+                }
+            }
+
+            priceVolumeSeries = [
+                {
+                    "type": 'Area',
+                    "data": data.priceVolumeSeriesArea,
+                    "options": {
+                        "topColor": 'rgba(38,198,218, 0.56)',
+                        "bottomColor": 'rgba(38,198,218, 0.04)',
+                        "lineColor": 'rgba(38,198,218, 1)',
+                        "lineWidth": 2,
+                    }
+                },
+                {
+                    "type": 'Histogram',
+                    "data": data.priceVolumeSeriesHistogram,
+                    "options": {
+                        "color": '#26a69a',
+                        "priceFormat": {
+                            "type": 'volume',
+                        },
+                        "priceScaleId": ""  # set as an overlay setting,
+                    },
+                    "priceScale": {
+                        "scaleMargins": {
+                            "top": 0.7,
+                            "bottom": 0,
+                        }
+                    }
+                }
+            ]
+
+            renderLightweightCharts([
+                {
+                    "chart": priceVolumeChartOptions,
+                    "series": priceVolumeSeries
+                }
+            ], 'priceAndVolume')
