@@ -246,7 +246,7 @@ with st.container(border=True):
                 [-23.46411077802282, -46.46128453747276],
                 columns=['lat', 'lon'])
 
-            st.map(df)
+            st.map(df, zoom=13)
 
     with col9:
 
