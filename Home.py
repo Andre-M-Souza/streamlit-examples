@@ -9,7 +9,18 @@ import numpy as np
 import pandas as pd
 import altair as alt
 
+v_login_ok = ''
+
 st.set_page_config(layout='wide')
+
+# User credentials...
+valid_username = "andremsouza"
+valid_password = "teste123"
+
+
+def authenticate_user(username, password):
+    # Simulate user authentication
+    return username == valid_username and password == valid_password
 
 
 def run_again():
@@ -17,6 +28,11 @@ def run_again():
 
 
 with st.sidebar:
+
+    st.header("Login")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    login_button = st.button("Login")
 
     option = st.selectbox(
         'Mês / Ano ?',
@@ -104,239 +120,250 @@ x = np.linspace(-1, 1, 50)
 y1 = 2*x + 1
 y2 = 2**x + 1
 
-# Chart 07
 
+# Loading styles...
 
-# Load styles...
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # Title...
+
 st.title(f'Dashboard - KPI(s): {option}')
 
 # Main Container.....
 with st.container(border=True):
 
-    col1, col2, col3, col4, col5 = st.columns(5, gap='large')
+    # Authentication check.....
 
-    with col1:
+    if login_button:
+        if authenticate_user(username, password):
+            st.success("Login successful!")
+            v_login_ok = 'X'
+        else:
+            st.error("Invalid username or password")
 
-        with st.container(border=True):
+    if v_login_ok == 'X':
 
-            st.markdown('Good Catches / Near Misses')
-            st.metric('registros :sunglasses:', value='54', delta='52')
+        # Layout....
 
-            fig1, ax1 = plt.subplots()
-            ax1.pie(sizes, explode=explode, labels=labels,
-                    autopct='%1.1f%%', shadow=True, startangle=90)
-            # Equal aspect ratio ensures that pie is drawn as a circle.
-            ax1.axis('equal')
+        col1, col2, col3, col4, col5 = st.columns(5, gap='large')
 
-            st.pyplot(fig1)
+        with col1:
 
-    with col2:
+            with st.container(border=True):
 
-        with st.container(border=True):
+                st.markdown('Good Catches / Near Misses')
+                st.metric('registros :sunglasses:', value='54', delta='52')
 
-            st.markdown('RFT')
-            st.metric('blablabla :+1:', value='80 %', delta='85 %')
+                fig1, ax1 = plt.subplots()
+                ax1.pie(sizes, explode=explode, labels=labels,
+                        autopct='%1.1f%%', shadow=True, startangle=90)
+                # Equal aspect ratio ensures that pie is drawn as a circle.
+                ax1.axis('equal')
 
-            fig2, ax2 = plt.subplots()
-            ax2.bar(fruits, counts, label=bar_labels, color=bar_colors)
+                st.pyplot(fig1)
 
-            ax2.set_ylabel('fruit supply')
-            ax2.set_title('Fruit supply by kind and color')
-            ax2.legend(title='Fruit color')
+        with col2:
 
-            st.pyplot(fig2)
+            with st.container(border=True):
 
-    with col3:
+                st.markdown('RFT')
+                st.metric('blablabla :+1:', value='80 %', delta='85 %')
 
-        with st.container(border=True):
+                fig2, ax2 = plt.subplots()
+                ax2.bar(fruits, counts, label=bar_labels, color=bar_colors)
 
-            st.markdown('Reclamação de Cliente')
-            st.metric('registros :sunglasses:', value='54', delta='52')
+                ax2.set_ylabel('fruit supply')
+                ax2.set_title('Fruit supply by kind and color')
+                ax2.legend(title='Fruit color')
 
-            fig3, ax3 = plt.subplots()
-            bottom = np.zeros(3)
+                st.pyplot(fig2)
 
-            for sex, sex_count in sex_counts.items():
-                p = ax3.bar(species, sex_count, width,
-                            label=sex, bottom=bottom)
-                bottom += sex_count
+        with col3:
 
-                ax3.bar_label(p, label_type='center')
+            with st.container(border=True):
 
-            ax3.set_title('Number of penguins by sex')
-            ax3.legend()
+                st.markdown('Reclamação de Cliente')
+                st.metric('registros :sunglasses:', value='54', delta='52')
 
-            st.pyplot(fig3)
+                fig3, ax3 = plt.subplots()
+                bottom = np.zeros(3)
 
-    with col4:
+                for sex, sex_count in sex_counts.items():
+                    p = ax3.bar(species, sex_count, width,
+                                label=sex, bottom=bottom)
+                    bottom += sex_count
 
-        with st.container(border=True):
+                    ax3.bar_label(p, label_type='center')
 
-            st.markdown('Cycle Time')
-            st.metric('registros :sunglasses:', value='54', delta='52')
+                ax3.set_title('Number of penguins by sex')
+                ax3.legend()
 
-            fig4, ax4 = survey(results, category_names)
-            st.pyplot(fig4)
+                st.pyplot(fig3)
 
-    with col5:
+        with col4:
 
-        with st.container(border=True):
+            with st.container(border=True):
 
-            st.markdown('Schedule Adherence')
-            st.metric('registros :sunglasses:', value='54', delta='52')
+                st.markdown('Cycle Time')
+                st.metric('registros :sunglasses:', value='54', delta='52')
 
-            # Generate one normal distribution
-            dist1 = rng.standard_normal(N_points)
-            fig5, ax5 = plt.subplots(1, 1, sharey=True, tight_layout=True)
-            # We can set the number of bins with the *bins* keyword argument.
-            ax5.hist(dist1, bins=n_bins)
-            st.pyplot(fig5)
+                fig4, ax4 = survey(results, category_names)
+                st.pyplot(fig4)
 
-with st.container(border=True):
+        with col5:
 
-    col6, col7, col8, col9, col10 = st.columns(5, gap='large')
+            with st.container(border=True):
 
-    with col6:
+                st.markdown('Schedule Adherence')
+                st.metric('registros :sunglasses:', value='54', delta='52')
 
-        with st.container(border=True):
+                # Generate one normal distribution
+                dist1 = rng.standard_normal(N_points)
+                fig5, ax5 = plt.subplots(1, 1, sharey=True, tight_layout=True)
+                # We can set the number of bins with the *bins* keyword argument.
+                ax5.hist(dist1, bins=n_bins)
+                st.pyplot(fig5)
 
-            st.markdown('Volume de Produção')
-            st.metric('registros :sunglasses:', value='54', delta='52')
+        col6, col7, col8, col9, col10 = st.columns(5, gap='large')
 
-            fig6 = plt.figure()
-            ax6 = fig6.add_subplot(1, 1, 1)
-            ax6.plot(x, y1)
-            ax6.set_xlabel("I am x")
-            ax6.set_ylabel("I am y")
-            ax6.set_title("with labels")
+        with col6:
 
-            st.pyplot(fig6)
+            with st.container(border=True):
 
-    with col7:
+                st.markdown('Volume de Produção')
+                st.metric('registros :sunglasses:', value='54', delta='52')
 
-        with st.container(border=True):
+                fig6 = plt.figure()
+                ax6 = fig6.add_subplot(1, 1, 1)
+                ax6.plot(x, y1)
+                ax6.set_xlabel("I am x")
+                ax6.set_ylabel("I am y")
+                ax6.set_title("with labels")
 
-            st.markdown('Custo por Litro')
-            st.metric('registros :sunglasses:', value='54', delta='52')
+                st.pyplot(fig6)
 
-            chart_data = pd.DataFrame(
-                np.random.randn(20, 3), columns=["a", "b", "c"])
+        with col7:
 
-            c = (
-                alt.Chart(chart_data)
-                .mark_circle()
-                .encode(x="a", y="b", size="c", color="c", tooltip=["a", "b", "c"])
-            )
+            with st.container(border=True):
 
-            st.altair_chart(c, use_container_width=True)
+                st.markdown('Custo por Litro')
+                st.metric('registros :sunglasses:', value='54', delta='52')
 
-    with col8:
+                chart_data = pd.DataFrame(
+                    np.random.randn(20, 3), columns=["a", "b", "c"])
 
-        with st.container(border=True):
+                c = (
+                    alt.Chart(chart_data)
+                    .mark_circle()
+                    .encode(x="a", y="b", size="c", color="c", tooltip=["a", "b", "c"])
+                )
 
-            st.markdown('OTIF')
-            st.metric('registros :sunglasses:', value='54', delta='52')
+                st.altair_chart(c, use_container_width=True)
 
-            df = pd.DataFrame(
-                np.random.randn(5, 2) / [50, 50] +
-                [-23.46411077802282, -46.46128453747276],
-                columns=['lat', 'lon'])
+        with col8:
 
-            st.map(df, zoom=13)
+            with st.container(border=True):
 
-    with col9:
+                st.markdown('OTIF')
+                st.metric('registros :sunglasses:', value='54', delta='52')
 
-        with st.container(border=True):
+                df = pd.DataFrame(
+                    np.random.randn(5, 2) / [50, 50] +
+                    [-23.46411077802282, -46.46128453747276],
+                    columns=['lat', 'lon'])
 
-            st.markdown('Hora Extra')
-            st.metric('registros :sunglasses:', value='54', delta='52')
+                st.map(df, zoom=13)
 
-            chart_data = pd.DataFrame(
-                {
-                    "col1": np.random.randn(10),
-                    "col2": np.random.randn(10),
-                    "col3": np.random.choice(["A", "B", "C"], 10),
-                }
-            )
+        with col9:
 
-            st.area_chart(chart_data, x="col1", y="col2", color="col3")
+            with st.container(border=True):
 
-    with col10:
+                st.markdown('Hora Extra')
+                st.metric('registros :sunglasses:', value='54', delta='52')
 
-        with st.container(border=True):
-
-            st.markdown('Absenteísmo')
-            st.metric('registros :-1:', value='54', delta='52')
-
-            priceVolumeChartOptions = {
-                "height": 300,
-                "rightPriceScale": {
-                    "scaleMargins": {
-                        "top": 0.2,
-                        "bottom": 0.25,
-                    },
-                    "borderVisible": False,
-                },
-                "overlayPriceScales": {
-                    "scaleMargins": {
-                        "top": 0.7,
-                        "bottom": 0,
+                chart_data = pd.DataFrame(
+                    {
+                        "col1": np.random.randn(10),
+                        "col2": np.random.randn(10),
+                        "col3": np.random.choice(["A", "B", "C"], 10),
                     }
-                },
-                "layout": {
-                    "background": {
-                        "type": 'solid',
-                        "color": '#131722'
-                    },
-                    "textColor": '#d1d4dc',
-                },
-                "grid": {
-                    "vertLines": {
-                        "color": 'rgba(42, 46, 57, 0)',
-                    },
-                    "horzLines": {
-                        "color": 'rgba(42, 46, 57, 0.6)',
-                    }
-                }
-            }
+                )
 
-            priceVolumeSeries = [
-                {
-                    "type": 'Area',
-                    "data": data.priceVolumeSeriesArea,
-                    "options": {
-                        "topColor": 'rgba(38,198,218, 0.56)',
-                        "bottomColor": 'rgba(38,198,218, 0.04)',
-                        "lineColor": 'rgba(38,198,218, 1)',
-                        "lineWidth": 2,
-                    }
-                },
-                {
-                    "type": 'Histogram',
-                    "data": data.priceVolumeSeriesHistogram,
-                    "options": {
-                        "color": '#26a69a',
-                        "priceFormat": {
-                            "type": 'volume',
+                st.area_chart(chart_data, x="col1", y="col2", color="col3")
+
+        with col10:
+
+            with st.container(border=True):
+
+                st.markdown('Absenteísmo')
+                st.metric('registros :-1:', value='54', delta='52')
+
+                priceVolumeChartOptions = {
+                    "height": 300,
+                    "rightPriceScale": {
+                        "scaleMargins": {
+                            "top": 0.2,
+                            "bottom": 0.25,
                         },
-                        "priceScaleId": ""  # set as an overlay setting,
+                        "borderVisible": False,
                     },
-                    "priceScale": {
+                    "overlayPriceScales": {
                         "scaleMargins": {
                             "top": 0.7,
                             "bottom": 0,
                         }
+                    },
+                    "layout": {
+                        "background": {
+                            "type": 'solid',
+                            "color": '#131722'
+                        },
+                        "textColor": '#d1d4dc',
+                    },
+                    "grid": {
+                        "vertLines": {
+                            "color": 'rgba(42, 46, 57, 0)',
+                        },
+                        "horzLines": {
+                            "color": 'rgba(42, 46, 57, 0.6)',
+                        }
                     }
                 }
-            ]
 
-            renderLightweightCharts([
-                {
-                    "chart": priceVolumeChartOptions,
-                    "series": priceVolumeSeries
-                }
-            ], 'priceAndVolume')
+                priceVolumeSeries = [
+                    {
+                        "type": 'Area',
+                        "data": data.priceVolumeSeriesArea,
+                        "options": {
+                            "topColor": 'rgba(38,198,218, 0.56)',
+                            "bottomColor": 'rgba(38,198,218, 0.04)',
+                            "lineColor": 'rgba(38,198,218, 1)',
+                            "lineWidth": 2,
+                        }
+                    },
+                    {
+                        "type": 'Histogram',
+                        "data": data.priceVolumeSeriesHistogram,
+                        "options": {
+                            "color": '#26a69a',
+                            "priceFormat": {
+                                "type": 'volume',
+                            },
+                            "priceScaleId": ""  # set as an overlay setting,
+                        },
+                        "priceScale": {
+                            "scaleMargins": {
+                                "top": 0.7,
+                                "bottom": 0,
+                            }
+                        }
+                    }
+                ]
+
+                renderLightweightCharts([
+                    {
+                        "chart": priceVolumeChartOptions,
+                        "series": priceVolumeSeries
+                    }
+                ], 'priceAndVolume')
